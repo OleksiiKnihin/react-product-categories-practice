@@ -28,6 +28,7 @@ function getUserById(userId) {
 export const App = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchValue, setSearchValue] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const filteredProducts = products.filter(product => {
     const curentUser = selectedUserId
@@ -36,9 +37,20 @@ export const App = () => {
     const curentSearch = product.name
       .toLocaleLowerCase()
       .includes(searchValue.toLocaleLowerCase());
+    const curentCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(product.category.id);
 
-    return curentSearch && curentUser;
+    return curentSearch && curentUser && curentCategory;
   });
+
+  const handleCategoryToggle = categoryId => {
+    if (selectedCategories.includes(categoryId)) {
+      setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
+    } else {
+      setSelectedCategories([...selectedCategories, categoryId]);
+    }
+  };
 
   return (
     <div className="section">
@@ -109,29 +121,17 @@ export const App = () => {
               >
                 All
               </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 4
-              </a>
+              {categoriesFromServer.map(category => (
+                <a
+                  data-cy="Category"
+                  className={`button ${selectedCategories.includes(category.id) ? 'is-info' : ''} mr-2 my-1`}
+                  href="#/"
+                  key={category.id}
+                  onClick={() => handleCategoryToggle(category.id)}
+                >
+                  {category.title}
+                </a>
+              ))}
             </div>
 
             <div className="panel-block">
@@ -142,6 +142,7 @@ export const App = () => {
                 onClick={() => {
                   setSelectedUserId(null);
                   setSearchValue('');
+                  setSelectedCategories([]);
                 }}
               >
                 Reset all filters
@@ -232,44 +233,6 @@ export const App = () => {
                     </td>
                   </tr>
                 ))}
-                {/* <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  1
-                </td>
-
-                <td data-cy="ProductName">Milk</td>
-                <td data-cy="ProductCategory">🍺 - Drinks</td>
-
-                <td data-cy="ProductUser" className="has-text-link">
-                  Max
-                </td>
-              </tr>
-
-              <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  2
-                </td>
-
-                <td data-cy="ProductName">Bread</td>
-                <td data-cy="ProductCategory">🍞 - Grocery</td>
-
-                <td data-cy="ProductUser" className="has-text-danger">
-                  Anna
-                </td>
-              </tr>
-
-              <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  3
-                </td>
-
-                <td data-cy="ProductName">iPhone</td>
-                <td data-cy="ProductCategory">💻 - Electronics</td>
-
-                <td data-cy="ProductUser" className="has-text-link">
-                  Roma
-                </td>
-              </tr> */}
               </tbody>
             </table>
           )}
