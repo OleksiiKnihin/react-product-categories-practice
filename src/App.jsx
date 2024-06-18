@@ -27,12 +27,18 @@ function getUserById(userId) {
 
 export const App = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [searchValue, setSearchValue] = useState('');
 
-  const filteredProducts = selectedUserId
-    ? products.filter(
-        product => product.user && product.user.id === selectedUserId,
-      )
-    : products;
+  const filteredProducts = products.filter(product => {
+    const curentUser = selectedUserId
+      ? product.user && product.user.id === selectedUserId
+      : true;
+    const curentSearch = product.name
+      .toLocaleLowerCase()
+      .includes(searchValue.toLocaleLowerCase());
+
+    return curentSearch && curentUser;
+  });
 
   return (
     <div className="section">
@@ -73,21 +79,25 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={searchValue}
+                  onChange={event => setSearchValue(event.target.value)}
                 />
 
                 <span className="icon is-left">
                   <i className="fas fa-search" aria-hidden="true" />
                 </span>
 
-                <span className="icon is-right">
-                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                  <button
-                    data-cy="ClearButton"
-                    type="button"
-                    className="delete"
-                  />
-                </span>
+                {searchValue && (
+                  <span className="icon is-right">
+                    {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                    <button
+                      data-cy="ClearButton"
+                      type="button"
+                      className="delete"
+                      onClick={() => setSearchValue('')}
+                    />
+                  </span>
+                )}
               </p>
             </div>
 
